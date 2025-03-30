@@ -1,6 +1,6 @@
 {
-  "id": "eb98367e-39b1-4522-be57-9036c7960197",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "b4103c8e-7fef-4c23-9f31-c4e9fa1a9c4e",
+  "prevId": "65b97bcd-8035-417f-ad83-5ea417d0c378",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -45,6 +45,12 @@
         },
         "password": {
           "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "otp": {
+          "name": "otp",
           "type": "text",
           "primaryKey": false,
           "notNull": true

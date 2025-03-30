@@ -10,7 +10,7 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8888;
 // allow cookie
 app.use((0, cookie_parser_1.default)());
-// alloe json
+// allow json
 app.use(express_1.default.json());
 app.listen(PORT, () => {
     console.log(`Fit life gym's backend is up and runnign on port ${PORT}`);
@@ -18,3 +18,6 @@ app.listen(PORT, () => {
 app.get("/", (req, res) => {
     res.send("Hello there!!, via backend serevr.");
 });
+// routes
+const member_route_1 = __importDefault(require("./routes/member.route"));
+app.use("/api/v1", member_route_1.default);
