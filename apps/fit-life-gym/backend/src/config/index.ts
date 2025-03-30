@@ -3,9 +3,10 @@ export const responseMessages = {
     signupSuccess: "Signup success",
     serverError: "Internal server error, try again",
     invalidInput: "Inputs are not accurate",
-    notFound: "Nothing found with the provided inputs",
-    notAuthorized: "Unauthorized, check credentials, login again",
-    emailAlreadyExists: "This email already exists"
+    notFound: "Nothing found with the provided inputs, make sure inputs are correct",
+    notAuthorized: "Unauthorized, check credentials",
+    emailAlreadyExists: "This email already exists",
+    invalidJwt: "Invalid jwt login again"
 }
 
 export const generateOtp = (otpLength: number) => {

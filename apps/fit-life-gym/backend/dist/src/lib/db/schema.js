@@ -9,5 +9,6 @@ exports.member = (0, pg_core_1.pgTable)("members", {
     email: (0, pg_core_1.text)().notNull(),
     password: (0, pg_core_1.text)().notNull(),
     otp: (0, pg_core_1.text)().notNull(),
+    isAccountVerified: (0, pg_core_1.boolean)().default(false),
     profileImage: (0, pg_core_1.text)().notNull().default("habibi.jpg")
 });
