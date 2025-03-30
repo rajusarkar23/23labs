@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8888
 
 // allow cookie
 app.use(cookieParser())
-// alloe json
+// allow json
 app.use(express.json())
 
 app.listen(PORT, () => {
@@ -17,3 +17,7 @@ app.listen(PORT, () => {
 app.get("/", (req, res) => {
     res.send("Hello there!!, via backend serevr.")
 })
+
+// routes
+import memberRouter from "./routes/member.route"
+app.use("/api/v1", memberRouter)
