@@ -89,12 +89,12 @@ const verifyOtp = async (req: Request, res: any) => {
   if (typeof user !== "number") {
     return res
       .status(401)
-      .json({ success: false, message: responseMessages.notAuthorized });
+      .json({ success: false, message: responseMessages.invalidInput });
   }
 
   try {
     const getUser = await db
-      .select({ otp: member.otp, id: member.id })
+      .select({ otp: member.otp, id: member.id, username: member.userName })
       .from(member)
       .where(eq(member.id, user));
     const dbOTP = getUser[0].otp;
@@ -122,12 +122,12 @@ const verifyOtp = async (req: Request, res: any) => {
           maxAge: 10 * 60 * 1000,
         })
         .status(200)
-        .json({ success: true, message: responseMessages.signin });
+        .json({ success: true, message: responseMessages.signin, username: getUser[0].username });
     }
 
     return res
       .status(401)
-      .json({ success: false, message: responseMessages.invalidInput });
+      .json({ success: false, message: responseMessages.invalidOtp });
   } catch (error) {
     console.log(error);
     return res

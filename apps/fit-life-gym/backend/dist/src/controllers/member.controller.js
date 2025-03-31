@@ -92,11 +92,11 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (typeof user !== "number") {
         return res
             .status(401)
-            .json({ success: false, message: config_1.responseMessages.notAuthorized });
+            .json({ success: false, message: config_1.responseMessages.invalidInput });
     }
     try {
         const getUser = yield db_1.db
-            .select({ otp: schema_1.member.otp, id: schema_1.member.id })
+            .select({ otp: schema_1.member.otp, id: schema_1.member.id, username: schema_1.member.userName })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.id, user));
         const dbOTP = getUser[0].otp;
@@ -117,11 +117,11 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 maxAge: 10 * 60 * 1000,
             })
                 .status(200)
-                .json({ success: true, message: config_1.responseMessages.signin });
+                .json({ success: true, message: config_1.responseMessages.signin, username: getUser[0].username });
         }
         return res
             .status(401)
-            .json({ success: false, message: config_1.responseMessages.invalidInput });
+            .json({ success: false, message: config_1.responseMessages.invalidOtp });
     }
     catch (error) {
         console.log(error);
