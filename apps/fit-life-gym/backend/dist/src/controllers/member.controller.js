@@ -114,7 +114,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 .cookie("_fit_life_gym_auth", jwt_token, {
                 httpOnly: true,
                 secure: true,
-                maxAge: 10 * 60 * 1000,
+                maxAge: 7 * 24 * 60 * 1000,
             })
                 .status(200)
                 .json({ success: true, message: config_1.responseMessages.signin, username: getUser[0].username });
@@ -134,7 +134,6 @@ exports.verifyOtp = verifyOtp;
 // member signin
 const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { signinData } = req.body;
-    console.log(signinData);
     if (typeof signinData.data.email !== "string" || typeof signinData.data.password !== "string") {
         return res
             .status(401)
@@ -146,6 +145,8 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             id: schema_1.member.id,
             email: schema_1.member.email,
             password: schema_1.member.password,
+            isVerified: schema_1.member.isAccountVerified,
+            username: schema_1.member.userName
         })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.email, signinData.data.email));
@@ -153,6 +154,9 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res
                 .status(401)
                 .json({ success: false, message: config_1.responseMessages.notFound });
+        }
+        if (!getDbUser[0].isVerified) {
+            return res.status(401).json({ success: false, message: "This account is not verified." });
         }
         const dbPassword = getDbUser[0].password;
         const compare = yield bcrypt_1.default.compare(signinData.data.password, dbPassword);
@@ -163,8 +167,8 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.cookie("_fit_life_gym_auth", jwt_token, {
             httpOnly: true,
             secure: true,
-            maxAge: 10 * 60 * 100
-        }).status(200).json({ success: true, message: config_1.responseMessages.signin });
+            maxAge: 7 * 24 * 60 * 100
+        }).status(200).json({ success: true, message: config_1.responseMessages.signin, username: getDbUser[0].username });
     }
     catch (error) {
         console.log(error);

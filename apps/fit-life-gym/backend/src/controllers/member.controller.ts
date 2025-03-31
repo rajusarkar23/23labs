@@ -119,7 +119,7 @@ const verifyOtp = async (req: Request, res: any) => {
         .cookie("_fit_life_gym_auth", jwt_token, {
           httpOnly: true,
           secure: true,
-          maxAge: 10 * 60 * 1000,
+          maxAge: 7 * 24 * 60 * 1000,
         })
         .status(200)
         .json({ success: true, message: responseMessages.signin, username: getUser[0].username });
@@ -152,6 +152,8 @@ const signin = async (req: Request, res: any) => {
         id: member.id,
         email: member.email,
         password: member.password,
+        isVerified: member.isAccountVerified,
+        username: member.userName
       })
       .from(member)
       .where(eq(member.email, signinData.data.email));
@@ -160,6 +162,10 @@ const signin = async (req: Request, res: any) => {
       return res
         .status(401)
         .json({ success: false, message: responseMessages.notFound });
+    }
+
+    if (!getDbUser[0].isVerified) {
+      return res.status(401).json({success: false, message :"This account is not verified."})
     }
 
     const dbPassword = getDbUser[0].password;
@@ -173,8 +179,8 @@ const signin = async (req: Request, res: any) => {
     return res.cookie("_fit_life_gym_auth", jwt_token, {
       httpOnly: true,
       secure: true,
-      maxAge: 10 * 60 * 100
-    }).status(200).json({success: true, message: responseMessages.signin})
+      maxAge: 7 * 24 * 60 * 100
+    }).status(200).json({success: true, message: responseMessages.signin, username: getDbUser[0].username})
   } catch (error) {
     console.log(error);
     return res.status(500).json({success: false, message: responseMessages.serverError})

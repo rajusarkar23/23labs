@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.member = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
+const config_1 = require("../../config");
 exports.member = (0, pg_core_1.pgTable)("members", {
     id: (0, pg_core_1.integer)().primaryKey().generatedAlwaysAsIdentity(),
     name: (0, pg_core_1.text)().notNull(),
@@ -10,5 +11,5 @@ exports.member = (0, pg_core_1.pgTable)("members", {
     password: (0, pg_core_1.text)().notNull(),
     otp: (0, pg_core_1.text)().notNull(),
     isAccountVerified: (0, pg_core_1.boolean)().default(false),
-    profileImage: (0, pg_core_1.text)().notNull().default("habibi.jpg")
+    profileImage: (0, pg_core_1.text)().notNull().default(`${config_1.profileImage}`)
 });
