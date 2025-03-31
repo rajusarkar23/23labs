@@ -133,8 +133,9 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.verifyOtp = verifyOtp;
 // member signin
 const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    if (typeof email !== "string" || typeof password !== "string") {
+    const { signinData } = req.body;
+    console.log(signinData);
+    if (typeof signinData.data.email !== "string" || typeof signinData.data.password !== "string") {
         return res
             .status(401)
             .json({ success: false, message: config_1.responseMessages.invalidInput });
@@ -147,14 +148,14 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: schema_1.member.password,
         })
             .from(schema_1.member)
-            .where((0, drizzle_orm_1.eq)(schema_1.member.email, email));
+            .where((0, drizzle_orm_1.eq)(schema_1.member.email, signinData.data.email));
         if (getDbUser.length === 0) {
             return res
                 .status(401)
                 .json({ success: false, message: config_1.responseMessages.notFound });
         }
         const dbPassword = getDbUser[0].password;
-        const compare = yield bcrypt_1.default.compare(password, dbPassword);
+        const compare = yield bcrypt_1.default.compare(signinData.data.password, dbPassword);
         if (!compare) {
             return res.status(401).json({ success: false, message: config_1.responseMessages.notAuthorized });
         }

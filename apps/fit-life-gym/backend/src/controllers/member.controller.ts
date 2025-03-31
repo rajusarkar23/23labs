@@ -138,9 +138,9 @@ const verifyOtp = async (req: Request, res: any) => {
 
 // member signin
 const signin = async (req: Request, res: any) => {
-  const { email, password } = req.body;
+  const { signinData } = req.body;
 
-  if (typeof email !== "string" || typeof password !== "string") {
+  if (typeof signinData.data.email !== "string" || typeof signinData.data.password !== "string") {
     return res
       .status(401)
       .json({ success: false, message: responseMessages.invalidInput });
@@ -154,7 +154,7 @@ const signin = async (req: Request, res: any) => {
         password: member.password,
       })
       .from(member)
-      .where(eq(member.email, email));
+      .where(eq(member.email, signinData.data.email));
 
     if (getDbUser.length === 0) {
       return res
@@ -164,7 +164,7 @@ const signin = async (req: Request, res: any) => {
 
     const dbPassword = getDbUser[0].password;
 
-    const compare = await bcrypt.compare(password, dbPassword)
+    const compare = await bcrypt.compare(signinData.data.password, dbPassword)
     if (!compare) {
       return res.status(401).json({success: false, message: responseMessages.notAuthorized})
     }
