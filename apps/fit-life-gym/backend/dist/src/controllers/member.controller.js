@@ -114,7 +114,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 .cookie("_fit_life_gym_auth", jwt_token, {
                 httpOnly: true,
                 secure: true,
-                maxAge: 7 * 24 * 60 * 1000,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             })
                 .status(200)
                 .json({ success: true, message: config_1.responseMessages.signin, username: getUser[0].username });
@@ -167,7 +167,7 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.cookie("_fit_life_gym_auth", jwt_token, {
             httpOnly: true,
             secure: true,
-            maxAge: 7 * 24 * 60 * 100
+            maxAge: 7 * 24 * 60 * 60 * 1000
         }).status(200).json({ success: true, message: config_1.responseMessages.signin, username: getDbUser[0].username });
     }
     catch (error) {
