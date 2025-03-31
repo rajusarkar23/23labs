@@ -21,17 +21,17 @@ const drizzle_orm_1 = require("drizzle-orm");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // member signup
 const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password } = req.body;
+    const { signupData } = req.body;
     // checks
-    if (typeof name !== "string" ||
-        typeof email !== "string" ||
-        typeof password !== "string") {
+    if (typeof signupData.data.name !== "string" ||
+        typeof signupData.data.email !== "string" ||
+        typeof signupData.data.password !== "string") {
         return res
             .status(400)
             .json({ success: false, message: config_1.responseMessages.invalidInput });
     }
     // hash password
-    const hashedPassword = bcrypt_1.default.hashSync(password, 10);
+    const hashedPassword = bcrypt_1.default.hashSync(signupData.data.password, 10);
     // otp generator
     const otp = (0, config_1.generateOtp)(6);
     console.log(otp);
@@ -43,7 +43,7 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const dbValidator = yield db_1.db
             .select()
             .from(schema_1.member)
-            .where((0, drizzle_orm_1.eq)(schema_1.member.email, email));
+            .where((0, drizzle_orm_1.eq)(schema_1.member.email, signupData.data.email));
         if (dbValidator.length !== 0) {
             return res
                 .status(400)
@@ -53,9 +53,9 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const createMember = yield db_1.db
             .insert(schema_1.member)
             .values({
-            email,
-            name,
-            userName: email,
+            email: signupData.data.email,
+            name: signupData.data.name,
+            userName: signupData.data.email,
             password: hashedPassword,
             otp: hashedOtp,
         })
@@ -64,8 +64,9 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res
             .cookie("_fit_life_gym_verify", jwt_token, {
             httpOnly: true,
-            secure: true,
             maxAge: 10 * 60 * 1000,
+            sameSite: true,
+            secure: true
         })
             .status(201)
             .json({

@@ -8,19 +8,20 @@ import jwt from "jsonwebtoken";
 
 // member signup
 const signup = async (req: Request, res: any) => {
-  const { name, email, password } = req.body;
+  const {signupData} = req.body;
+  
   // checks
   if (
-    typeof name !== "string" ||
-    typeof email !== "string" ||
-    typeof password !== "string"
+    typeof signupData.data.name !== "string" ||
+    typeof signupData.data.email !== "string" ||
+    typeof signupData.data.password !== "string"
   ) {
     return res
       .status(400)
       .json({ success: false, message: responseMessages.invalidInput });
   }
   // hash password
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const hashedPassword = bcrypt.hashSync(signupData.data.password, 10);
   // otp generator
   const otp = generateOtp(6);
   console.log(otp);
@@ -33,7 +34,7 @@ const signup = async (req: Request, res: any) => {
     const dbValidator = await db
       .select()
       .from(member)
-      .where(eq(member.email, email));
+      .where(eq(member.email, signupData.data.email));
     if (dbValidator.length !== 0) {
       return res
         .status(400)
@@ -43,9 +44,9 @@ const signup = async (req: Request, res: any) => {
     const createMember = await db
       .insert(member)
       .values({
-        email,
-        name,
-        userName: email,
+        email: signupData.data.email,
+        name: signupData.data.name,
+        userName: signupData.data.email,
         password: hashedPassword,
         otp: hashedOtp,
       })
@@ -59,8 +60,9 @@ const signup = async (req: Request, res: any) => {
     return res
       .cookie("_fit_life_gym_verify", jwt_token, {
         httpOnly: true,
-        secure: true,
         maxAge: 10 * 60 * 1000,
+        sameSite: true,
+        secure: true
       })
       .status(201)
       .json({

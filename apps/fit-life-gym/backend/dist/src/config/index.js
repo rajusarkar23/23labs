@@ -7,7 +7,7 @@ exports.responseMessages = {
     serverError: "Internal server error, try again",
     invalidInput: "Inputs are not accurate",
     notFound: "Nothing found with the provided inputs, make sure inputs are correct",
-    notAuthorized: "Unauthorized, check credentials, login again",
+    notAuthorized: "Unauthorized, check credentials",
     emailAlreadyExists: "This email already exists",
     invalidJwt: "Invalid jwt login again"
 };
