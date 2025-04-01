@@ -50,6 +50,20 @@
       "when": 1743431624132,
       "tag": "0006_rapid_princess_powerful",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1743495703389,
+      "tag": "0007_happy_shiva",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1743495839573,
+      "tag": "0008_moaning_purple_man",
+      "breakpoints": true
     }
   ]
 }
