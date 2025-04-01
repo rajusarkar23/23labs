@@ -1,13 +1,13 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const member_controller_1 = require("../controllers/member.controller");
-const middlewares_1 = __importDefault(require("../lib/middlewares"));
+const middlewares_1 = require("../lib/middlewares");
 const router = (0, express_1.Router)();
 router.post("/member/auth/signup", member_controller_1.signup);
-router.post("/member/auth/verify-otp", middlewares_1.default, member_controller_1.verifyOtp);
+router.post("/member/auth/verify-otp", middlewares_1.otpVerifySession, member_controller_1.verifyOtp);
 router.post("/member/auth/signin", member_controller_1.signin);
+router.get("/member/profile/get-profile", middlewares_1.userAuthSession, member_controller_1.getProfileDetails);
+router.put("/member/profile/update-username", middlewares_1.userAuthSession, member_controller_1.updateUserName);
+router.put("/member/profile/update-name", middlewares_1.userAuthSession, member_controller_1.updateName);
 exports.default = router;
