@@ -28,3 +28,5 @@ app.get("/", (req, res) => {
 // routes
 const member_route_1 = __importDefault(require("./routes/member.route"));
 app.use("/api/v1", member_route_1.default);
+const post_route_1 = __importDefault(require("./routes/post.route"));
+app.use("/api/v1", post_route_1.default);
