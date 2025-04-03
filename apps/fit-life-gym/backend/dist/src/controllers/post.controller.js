@@ -9,14 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadFile = exports.create = void 0;
+exports.fetchPosts = exports.uploadFile = exports.create = void 0;
 const db_1 = require("../lib/db");
 const schema_1 = require("../lib/db/schema");
 // s3 client and putobject
 const client_s3_1 = require("@aws-sdk/client-s3");
+const drizzle_orm_1 = require("drizzle-orm");
 // create post
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { textContent, imageUrl } = req.body;
+    const { textContent, postImageUrl } = req.body;
     //@ts-ignore
     const user = req.userId;
     if (typeof user !== "number") {
@@ -31,7 +32,7 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             .values({
             postBelongTo: user,
             textContent: textContent,
-            postImageUrl: imageUrl,
+            postImageUrl,
         })
             .returning();
         if (create.length === 0) {
@@ -72,7 +73,7 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         forcePathStyle: true,
     });
     // filename
-    const fileName = file.originalname;
+    const fileName = +new Date().getTime() + "_" + file.originalname;
     // upload params
     const uploadParams = {
         Bucket: process.env.CLOUDFLARE_BUCKET_NAME,
@@ -104,3 +105,52 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.uploadFile = uploadFile;
+// fetch posts
+const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // @ts-ignore
+    const user = req.userId;
+    // checks
+    if (typeof user !== "number") {
+        return res.status(400).json({
+            successs: false,
+            message: "User id is not valid, try again",
+        });
+    }
+    try {
+        const getPosts = yield db_1.db
+            .select({
+            id: schema_1.post.id,
+            textContent: schema_1.post.textContent,
+            postImageUrl: schema_1.post.postImageUrl,
+            createdAt: schema_1.post.createdAt,
+            postCreator: schema_1.member.name,
+            createImageUrl: schema_1.member.profileImage
+        })
+            .from(schema_1.post)
+            .where((0, drizzle_orm_1.eq)(schema_1.post.postBelongTo, user))
+            .leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, user));
+        if (getPosts.length === 0) {
+            return res.status(400).json({
+                successs: false,
+                message: "You dont have any post yet",
+            });
+        }
+        // getting posts in descending order
+        const get = getPosts.sort((x, y) => {
+            return Number(new Date(y.createdAt)) - Number(new Date(x.createdAt));
+        });
+        return res.status(201).json({
+            success: true,
+            message: "Posts fetched successfully",
+            posts: get,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            successs: false,
+            message: "Intenal server error",
+        });
+    }
+});
+exports.fetchPosts = fetchPosts;

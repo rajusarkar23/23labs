@@ -14,4 +14,5 @@ const memoryStorage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage: memoryStorage });
 router.post("/member/post/create", middlewares_1.userAuthSession, post_controller_1.create);
 router.post("/member/post/upload-post-image", upload.single("file"), post_controller_1.uploadFile);
+router.get("/member/post/get-posts", middlewares_1.userAuthSession, post_controller_1.fetchPosts);
 exports.default = router;
