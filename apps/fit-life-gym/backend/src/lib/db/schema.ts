@@ -33,4 +33,22 @@ export const post = pgTable("posts", {
       .notNull()
       .$onUpdate(() => new Date()),
   });
+
+// like table
+export const like = pgTable("likes", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  likeFor: integer("like_for").notNull().references(() => post.id, {onDelete: "cascade"}),
+  likeBy: integer("like_by").notNull().references(() => member.id, {onDelete: "cascade"}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").$onUpdate(() => new Date())
+}) 
+
+// comments table
+export const comment = pgTable("comments", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  commentFor: integer("comment_for").notNull().references(() => post.id, {onDelete: "cascade"}),
+  commentBy: integer("comment_by").notNull().references(() => member.id, {onDelete: "cascade"}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").$onUpdate(() => new Date())
+})
   

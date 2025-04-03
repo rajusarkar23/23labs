@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.post = exports.member = exports.genderEnum = void 0;
+exports.comment = exports.like = exports.post = exports.member = exports.genderEnum = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const config_1 = require("../../config");
 exports.genderEnum = (0, pg_core_1.pgEnum)("gender", ["male", "female"]);
@@ -32,4 +32,20 @@ exports.post = (0, pg_core_1.pgTable)("posts", {
     updatedAt: (0, pg_core_1.timestamp)("updated_at  ")
         .notNull()
         .$onUpdate(() => new Date()),
+});
+// like table
+exports.like = (0, pg_core_1.pgTable)("likes", {
+    id: (0, pg_core_1.integer)("id").primaryKey().generatedAlwaysAsIdentity(),
+    likeFor: (0, pg_core_1.integer)("like_for").notNull().references(() => exports.post.id, { onDelete: "cascade" }),
+    likeBy: (0, pg_core_1.integer)("like_by").notNull().references(() => exports.member.id, { onDelete: "cascade" }),
+    createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow(),
+    updatedAt: (0, pg_core_1.timestamp)("updated_at").$onUpdate(() => new Date())
+});
+// comments table
+exports.comment = (0, pg_core_1.pgTable)("comments", {
+    id: (0, pg_core_1.integer)("id").primaryKey().generatedAlwaysAsIdentity(),
+    commentFor: (0, pg_core_1.integer)("comment_for").notNull().references(() => exports.post.id, { onDelete: "cascade" }),
+    commentBy: (0, pg_core_1.integer)("comment_by").notNull().references(() => exports.member.id, { onDelete: "cascade" }),
+    createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow(),
+    updatedAt: (0, pg_core_1.timestamp)("updated_at").$onUpdate(() => new Date())
 });
