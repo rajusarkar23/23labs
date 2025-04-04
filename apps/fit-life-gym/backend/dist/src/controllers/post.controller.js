@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchPosts = exports.uploadFile = exports.create = void 0;
+exports.fetchHomePosts = exports.fetchPosts = exports.uploadFile = exports.create = void 0;
 const db_1 = require("../lib/db");
 const schema_1 = require("../lib/db/schema");
 // s3 client and putobject
@@ -124,7 +124,7 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             postImageUrl: schema_1.post.postImageUrl,
             createdAt: schema_1.post.createdAt,
             postCreator: schema_1.member.name,
-            createImageUrl: schema_1.member.profileImage
+            createImageUrl: schema_1.member.profileImage,
         })
             .from(schema_1.post)
             .where((0, drizzle_orm_1.eq)(schema_1.post.postBelongTo, user))
@@ -154,3 +154,27 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.fetchPosts = fetchPosts;
+// fetch posts to space home
+const fetchHomePosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //@ts-ignore
+    const user = req.userId;
+    try {
+        const fetchPostsForHome = yield db_1.db
+            .select({
+            id: schema_1.post.id,
+            text: schema_1.post.textContent,
+            image: schema_1.post.postImageUrl,
+            likeBy: schema_1.like.likeBy,
+            likeFor: schema_1.like.likeFor,
+        })
+            .from(schema_1.post)
+            .leftJoin(schema_1.like, (0, drizzle_orm_1.eq)(schema_1.like.likeFor, schema_1.post.id));
+        return res
+            .status(200)
+            .json({ success: true, message: "Fetched", posts: fetchPostsForHome, fetchFor: user });
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
+exports.fetchHomePosts = fetchHomePosts;

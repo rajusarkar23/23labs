@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { db } from "../lib/db";
-import { member, post } from "../lib/db/schema";
+import { like, member, post } from "../lib/db/schema";
 // s3 client and putobject
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { eq } from "drizzle-orm";
@@ -123,7 +123,7 @@ const fetchPosts = async (req: Request, res: any) => {
         postImageUrl: post.postImageUrl,
         createdAt: post.createdAt,
         postCreator: member.name,
-        createImageUrl: member.profileImage
+        createImageUrl: member.profileImage,
       })
       .from(post)
       .where(eq(post.postBelongTo, user))
@@ -155,4 +155,30 @@ const fetchPosts = async (req: Request, res: any) => {
   }
 };
 
-export { create, uploadFile, fetchPosts };
+// fetch posts to space home
+const fetchHomePosts = async (req: Request, res: any) => {
+  //@ts-ignore
+  const user = req.userId;
+
+  try {
+    const fetchPostsForHome = await db
+      .select({
+        id: post.id,
+        text: post.textContent,
+        image: post.postImageUrl,
+        likeBy: like.likeBy,
+        likeFor: like.likeFor,
+      })
+      .from(post)
+      .leftJoin(like, eq(like.likeFor, post.id));
+
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Fetched", posts: fetchPostsForHome, fetchFor: user});
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { create, uploadFile, fetchPosts, fetchHomePosts };
