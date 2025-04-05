@@ -28,7 +28,6 @@ const manageLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     try {
         const findIfLikeAvailable = yield db_1.db.select().from(schema_1.like).where((0, drizzle_orm_1.eq)(schema_1.like.likeFor, postIdToNum)).leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, schema_1.like.likeBy));
-        console.log(findIfLikeAvailable);
         // delete
         if (findIfLikeAvailable.length !== 0) {
             yield db_1.db.delete(schema_1.like).where((0, drizzle_orm_1.eq)(schema_1.like.id, findIfLikeAvailable[0].likes.id));
