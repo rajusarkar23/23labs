@@ -16,6 +16,6 @@ const upload = (0, multer_1.default)({ storage: memoryStorage });
 router.post("/member/post/create", middlewares_1.userAuthSession, post_controller_1.create);
 router.post("/member/post/upload-post-image", upload.single("file"), post_controller_1.uploadFile);
 router.get("/member/post/get-posts", middlewares_1.userAuthSession, post_controller_1.fetchPosts);
-router.post("/member/post/like/add", middlewares_1.userAuthSession, like_controller_1.addLike);
+router.post("/member/post/like/manage", middlewares_1.userAuthSession, like_controller_1.manageLike);
 router.get("/member/post/get-home-posts", middlewares_1.userAuthSession, post_controller_1.fetchHomePosts);
 exports.default = router;

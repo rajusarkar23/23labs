@@ -124,10 +124,12 @@ const fetchPosts = async (req: Request, res: any) => {
         createdAt: post.createdAt,
         postCreator: member.name,
         createImageUrl: member.profileImage,
+        likeBy: like.likeBy,
+        likeFor: like.likeFor
       })
       .from(post)
       .where(eq(post.postBelongTo, user))
-      .leftJoin(member, eq(member.id, user));
+      .leftJoin(member, eq(member.id, user)).leftJoin(like, eq(like.likeFor, post.id))
 
     if (getPosts.length === 0) {
       return res.status(400).json({
@@ -145,6 +147,7 @@ const fetchPosts = async (req: Request, res: any) => {
       success: true,
       message: "Posts fetched successfully",
       posts: get,
+      fetchFor: user
     });
   } catch (error) {
     console.log(error);

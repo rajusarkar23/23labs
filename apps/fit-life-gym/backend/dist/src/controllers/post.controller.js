@@ -125,10 +125,12 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             createdAt: schema_1.post.createdAt,
             postCreator: schema_1.member.name,
             createImageUrl: schema_1.member.profileImage,
+            likeBy: schema_1.like.likeBy,
+            likeFor: schema_1.like.likeFor
         })
             .from(schema_1.post)
             .where((0, drizzle_orm_1.eq)(schema_1.post.postBelongTo, user))
-            .leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, user));
+            .leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, user)).leftJoin(schema_1.like, (0, drizzle_orm_1.eq)(schema_1.like.likeFor, schema_1.post.id));
         if (getPosts.length === 0) {
             return res.status(400).json({
                 successs: false,
@@ -143,6 +145,7 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             success: true,
             message: "Posts fetched successfully",
             posts: get,
+            fetchFor: user
         });
     }
     catch (error) {

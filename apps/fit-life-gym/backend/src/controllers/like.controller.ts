@@ -1,17 +1,15 @@
-import { Request } from "express";
-import { like } from "../lib/db/schema";
+import e, { Request } from "express";
+import { like, member } from "../lib/db/schema";
 import { db } from "../lib/db";
+import { eq } from "drizzle-orm";
 
 // add like
-const addLike = async (req: Request, res: any) => {
+const manageLike = async (req: Request, res: any) => {
     //@ts-ignore
     const user = req.userId
     const {post} = req.body
 
     const postIdToNum = Number(post)
-    
-
-
     
     // checks
     if (typeof user !== "number" || typeof postIdToNum !== "number") {
@@ -22,6 +20,17 @@ const addLike = async (req: Request, res: any) => {
     }
 
     try {
+
+
+        const findIfLikeAvailable = await db.select().from(like).where(eq(like.likeFor, postIdToNum)).leftJoin(member, eq(member.id, like.likeBy))
+
+        // delete
+        if (findIfLikeAvailable.length !== 0) {
+            await db.delete(like).where(eq(like.id, findIfLikeAvailable[0].likes.id))
+            return res.status(200).json({message: "deleted"})
+        }
+        
+
         const add = await db.insert(like).values({
             likeBy: user,
             likeFor: postIdToNum,
@@ -34,7 +43,7 @@ const addLike = async (req: Request, res: any) => {
             })
         }
 
-        return res.status(200).json({success: true, message: "Success"})
+        return res.status(200).json({success: true, message: "Success", likedFor: add[0].likeFor})
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -44,25 +53,4 @@ const addLike = async (req: Request, res: any) => {
     }
 }
 
-// remove like
-// const removeLike = async (req: Request, res: any) => {
-//     //@ts-ignore
-//     const user = req.userId
-//     const post = req.body
-//     if (typeof user !== "number" || typeof post !== "number") {
-//         return res.status(400).json({
-//             success: false,
-//             message: "Invalid input types."
-//         })
-//     }
-
-
-//     try {
-//         const remove = await db.delete(like).where(eq())
-//     } catch (error) {
-        
-//     }
-
-// }
-
-export {addLike}
+export {manageLike}

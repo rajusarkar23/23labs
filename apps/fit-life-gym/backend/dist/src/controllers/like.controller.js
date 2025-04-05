@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addLike = void 0;
+exports.manageLike = void 0;
 const schema_1 = require("../lib/db/schema");
 const db_1 = require("../lib/db");
+const drizzle_orm_1 = require("drizzle-orm");
 // add like
-const addLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const manageLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //@ts-ignore
     const user = req.userId;
     const { post } = req.body;
@@ -26,6 +27,13 @@ const addLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     try {
+        const findIfLikeAvailable = yield db_1.db.select().from(schema_1.like).where((0, drizzle_orm_1.eq)(schema_1.like.likeFor, postIdToNum)).leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, schema_1.like.likeBy));
+        console.log(findIfLikeAvailable);
+        // delete
+        if (findIfLikeAvailable.length !== 0) {
+            yield db_1.db.delete(schema_1.like).where((0, drizzle_orm_1.eq)(schema_1.like.id, findIfLikeAvailable[0].likes.id));
+            return res.status(200).json({ message: "deleted" });
+        }
         const add = yield db_1.db.insert(schema_1.like).values({
             likeBy: user,
             likeFor: postIdToNum,
@@ -36,7 +44,7 @@ const addLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 message: "Unable to add like, try again"
             });
         }
-        return res.status(200).json({ success: true, message: "Success" });
+        return res.status(200).json({ success: true, message: "Success", likedFor: add[0].likeFor });
     }
     catch (error) {
         console.log(error);
@@ -46,4 +54,4 @@ const addLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-exports.addLike = addLike;
+exports.manageLike = manageLike;
