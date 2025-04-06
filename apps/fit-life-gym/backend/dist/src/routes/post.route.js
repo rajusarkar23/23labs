@@ -18,6 +18,8 @@ router.post("/member/post/create", middlewares_1.userAuthSession, post_controlle
 router.post("/member/post/upload-post-image", upload.single("file"), post_controller_1.uploadFile);
 router.get("/member/post/get-posts", middlewares_1.userAuthSession, post_controller_1.fetchPosts);
 router.get("/member/post/get-home-posts", middlewares_1.userAuthSession, post_controller_1.fetchHomePosts);
+router.post("/member/post/like/fetch", like_controller_1.fetchLikes);
 router.post("/member/post/like/manage", middlewares_1.userAuthSession, like_controller_1.manageLike);
 router.post("/member/post/comment/add-comment", middlewares_1.userAuthSession, comment_controller_1.addComment);
+router.post("/member/post/comment/fetch-comments", comment_controller_1.fetchComments);
 exports.default = router;

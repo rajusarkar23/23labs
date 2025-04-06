@@ -9,9 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addComment = void 0;
+exports.fetchComments = exports.addComment = void 0;
 const db_1 = require("../lib/db");
 const schema_1 = require("../lib/db/schema");
+const drizzle_orm_1 = require("drizzle-orm");
+// add a new comment
 const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { comment, userName, commentFor } = req.body;
     //@ts-ignore
@@ -19,33 +21,66 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     if (typeof user !== "number") {
         return res.status(400).json({
             success: false,
-            message: "Invalid Id, login again"
+            message: "Invalid Id, login again",
         });
     }
     try {
-        const createComment = yield db_1.db.insert(schema_1.commentSchema).values({
+        const createComment = yield db_1.db
+            .insert(schema_1.commentSchema)
+            .values({
             comment,
             commentByName: userName,
             commentByUserIdId: user,
             commentFor,
-        }).returning();
+        })
+            .returning();
         if (createComment.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "Not able to post the comment try again later"
+                message: "Not able to post the comment try again later",
             });
         }
         return res.status(201).json({
             success: true,
-            message: "Comment created Successfully"
+            message: "Comment created Successfully",
         });
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
-            message: "Internal server error, please try again later."
+            message: "Internal server error, please try again later.",
         });
     }
 });
 exports.addComment = addComment;
+// fetch comments
+const fetchComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { ids } = req.body;
+    try {
+        const getComments = yield db_1.db
+            .select({
+            id: schema_1.commentSchema.id,
+            comment: schema_1.commentSchema.comment,
+            commentFor: schema_1.commentSchema.commentFor,
+            commentByName: schema_1.commentSchema.commentByName,
+            commentByUserIdId: schema_1.commentSchema.commentByUserIdId,
+        })
+            .from(schema_1.commentSchema)
+            .where((0, drizzle_orm_1.inArray)(schema_1.commentSchema.commentFor, ids));
+        if (getComments.length === 0) {
+            return res.status(400).json({
+                message: "No comment found",
+                success: false,
+            });
+        }
+        return res.status(200).json({ comments: getComments, success: true });
+    }
+    catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Internal server error" });
+    }
+});
+exports.fetchComments = fetchComments;
