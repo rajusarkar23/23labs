@@ -44,10 +44,12 @@ export const like = pgTable("likes", {
 }) 
 
 // comments table
-export const comment = pgTable("comments", {
+export const commentSchema = pgTable("comments", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  comment: text("comment").notNull(),
   commentFor: integer("comment_for").notNull().references(() => post.id, {onDelete: "cascade"}),
-  commentBy: integer("comment_by").notNull().references(() => member.id, {onDelete: "cascade"}),
+  commentByName: text("comment_by_name").notNull(),
+  commentByUserIdId: integer("comment_by_userId").notNull().references(() => member.id, {onDelete: "cascade"}),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").$onUpdate(() => new Date())
 })
