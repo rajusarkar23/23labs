@@ -21,5 +21,5 @@ router.get("/member/post/get-home-posts", middlewares_1.userAuthSession, post_co
 router.post("/member/post/like/fetch", like_controller_1.fetchLikes);
 router.post("/member/post/like/manage", middlewares_1.userAuthSession, like_controller_1.manageLike);
 router.post("/member/post/comment/add-comment", middlewares_1.userAuthSession, comment_controller_1.addComment);
-router.post("/member/post/comment/fetch-comments", comment_controller_1.fetchComments);
+router.post("/member/post/comment/fetch-comments", middlewares_1.userAuthSession, comment_controller_1.fetchComments);
 exports.default = router;

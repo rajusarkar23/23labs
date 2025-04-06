@@ -18,6 +18,6 @@ router.get("/member/post/get-home-posts", userAuthSession, fetchHomePosts)
 router.post("/member/post/like/fetch", fetchLikes)
 router.post("/member/post/like/manage", userAuthSession, manageLike)
 router.post("/member/post/comment/add-comment", userAuthSession, addComment)
-router.post("/member/post/comment/fetch-comments", fetchComments)
+router.post("/member/post/comment/fetch-comments", userAuthSession, fetchComments)
 
 export default router;
