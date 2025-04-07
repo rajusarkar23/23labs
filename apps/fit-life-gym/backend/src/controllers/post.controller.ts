@@ -125,11 +125,12 @@ const fetchPosts = async (req: Request, res: any) => {
         postCreator: member.name,
         createImageUrl: member.profileImage,
         likeBy: like.likeBy,
-        likeFor: like.likeFor
+        likeFor: like.likeFor,
       })
       .from(post)
       .where(eq(post.postBelongTo, user))
-      .leftJoin(member, eq(member.id, user)).leftJoin(like, eq(like.likeFor, post.id))
+      .leftJoin(member, eq(member.id, user))
+      .leftJoin(like, eq(like.likeFor, post.id));
 
     if (getPosts.length === 0) {
       return res.status(400).json({
@@ -147,7 +148,7 @@ const fetchPosts = async (req: Request, res: any) => {
       success: true,
       message: "Posts fetched successfully",
       posts: get,
-      fetchFor: user
+      fetchFor: user,
     });
   } catch (error) {
     console.log(error);
@@ -158,27 +159,32 @@ const fetchPosts = async (req: Request, res: any) => {
   }
 };
 
-// fetch posts to space home
+// fetch posts for space home
 const fetchHomePosts = async (req: Request, res: any) => {
   //@ts-ignore
   const user = req.userId;
 
   try {
-    const fetchPostsForHome = await db
+    const fetch = await db
       .select({
         id: post.id,
-        text: post.textContent,
-        image: post.postImageUrl,
-        likeBy: like.likeBy,
-        likeFor: like.likeFor,
+        postBelongTo: post.postBelongTo,
+        postImageUrl: post.postImageUrl,
+        textContent: post.textContent,
+        createdAt: post.createdAt,
+        postCreatorImageUrl: member.profileImage,
+        postCreatorName: member.name
       })
       .from(post)
-      .leftJoin(like, eq(like.likeFor, post.id));
+      .leftJoin(member, eq(member.id, post.postBelongTo))
 
+      const fetchPostsForHome = fetch.sort((x,y) => {
+        return Number(new Date(y.createdAt)) - Number(new Date(x.createdAt))
+      })
 
     return res
       .status(200)
-      .json({ success: true, message: "Fetched", posts: fetchPostsForHome, fetchFor: user});
+      .json({ success: true, message: "Fetched", posts: fetchPostsForHome });
   } catch (error) {
     console.log(error);
   }

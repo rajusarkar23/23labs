@@ -214,6 +214,7 @@ const getProfileDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
             dob: schema_1.member.dob,
             gender: schema_1.member.gender,
             profession: schema_1.member.profession,
+            memberId: schema_1.member.id
         })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.id, user));

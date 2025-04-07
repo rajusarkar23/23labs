@@ -57,8 +57,6 @@ exports.addComment = addComment;
 // fetch comments
 const fetchComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { ids } = req.body;
-    //@ts-ignore
-    const user = req.userId;
     try {
         const getComments = yield db_1.db
             .select({
@@ -70,7 +68,7 @@ const fetchComments = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             userProfileUrl: schema_1.member.profileImage
         })
             .from(schema_1.commentSchema)
-            .where((0, drizzle_orm_1.inArray)(schema_1.commentSchema.commentFor, ids)).leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, user));
+            .where((0, drizzle_orm_1.inArray)(schema_1.commentSchema.commentFor, ids)).leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, schema_1.commentSchema.commentByUserIdId));
         if (getComments.length === 0) {
             return res.status(400).json({
                 message: "No comment found",

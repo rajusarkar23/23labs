@@ -232,6 +232,7 @@ const getProfileDetails = async (req: Request, res: any) => {
         dob: member.dob,
         gender: member.gender,
         profession: member.profession,
+        memberId: member.id
       })
       .from(member)
       .where(eq(member.id, user));

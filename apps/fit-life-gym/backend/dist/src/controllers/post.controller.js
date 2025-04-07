@@ -126,11 +126,12 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             postCreator: schema_1.member.name,
             createImageUrl: schema_1.member.profileImage,
             likeBy: schema_1.like.likeBy,
-            likeFor: schema_1.like.likeFor
+            likeFor: schema_1.like.likeFor,
         })
             .from(schema_1.post)
             .where((0, drizzle_orm_1.eq)(schema_1.post.postBelongTo, user))
-            .leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, user)).leftJoin(schema_1.like, (0, drizzle_orm_1.eq)(schema_1.like.likeFor, schema_1.post.id));
+            .leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .leftJoin(schema_1.like, (0, drizzle_orm_1.eq)(schema_1.like.likeFor, schema_1.post.id));
         if (getPosts.length === 0) {
             return res.status(400).json({
                 successs: false,
@@ -145,7 +146,7 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             success: true,
             message: "Posts fetched successfully",
             posts: get,
-            fetchFor: user
+            fetchFor: user,
         });
     }
     catch (error) {
@@ -157,24 +158,29 @@ const fetchPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.fetchPosts = fetchPosts;
-// fetch posts to space home
+// fetch posts for space home
 const fetchHomePosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //@ts-ignore
     const user = req.userId;
     try {
-        const fetchPostsForHome = yield db_1.db
+        const fetch = yield db_1.db
             .select({
             id: schema_1.post.id,
-            text: schema_1.post.textContent,
-            image: schema_1.post.postImageUrl,
-            likeBy: schema_1.like.likeBy,
-            likeFor: schema_1.like.likeFor,
+            postBelongTo: schema_1.post.postBelongTo,
+            postImageUrl: schema_1.post.postImageUrl,
+            textContent: schema_1.post.textContent,
+            createdAt: schema_1.post.createdAt,
+            postCreatorImageUrl: schema_1.member.profileImage,
+            postCreatorName: schema_1.member.name
         })
             .from(schema_1.post)
-            .leftJoin(schema_1.like, (0, drizzle_orm_1.eq)(schema_1.like.likeFor, schema_1.post.id));
+            .leftJoin(schema_1.member, (0, drizzle_orm_1.eq)(schema_1.member.id, schema_1.post.postBelongTo));
+        const fetchPostsForHome = fetch.sort((x, y) => {
+            return Number(new Date(y.createdAt)) - Number(new Date(x.createdAt));
+        });
         return res
             .status(200)
-            .json({ success: true, message: "Fetched", posts: fetchPostsForHome, fetchFor: user });
+            .json({ success: true, message: "Fetched", posts: fetchPostsForHome });
     }
     catch (error) {
         console.log(error);
