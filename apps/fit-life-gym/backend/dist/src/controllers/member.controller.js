@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateName = exports.updateUserName = exports.getProfileDetails = exports.signin = exports.verifyOtp = exports.signup = void 0;
+exports.selectPlan = exports.updateName = exports.updateUserName = exports.getProfileDetails = exports.signin = exports.verifyOtp = exports.signup = void 0;
 const db_1 = require("../lib/db");
 const schema_1 = require("../lib/db/schema");
 const config_1 = require("../config");
@@ -96,7 +96,13 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     try {
         const getUser = yield db_1.db
-            .select({ otp: schema_1.member.otp, id: schema_1.member.id, username: schema_1.member.userName })
+            .select({
+            otp: schema_1.member.otp,
+            id: schema_1.member.id,
+            username: schema_1.member.userName,
+            selectedPlan: schema_1.member.selectedPlan,
+            isPlanSelected: schema_1.member.isPlanSelected,
+        })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.id, user));
         const dbOTP = getUser[0].otp;
@@ -121,6 +127,8 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 success: true,
                 message: config_1.responseMessages.signin,
                 username: getUser[0].username,
+                selectedPlan: getUser[0].selectedPlan,
+                isPlanSelected: getUser[0].isPlanSelected,
             });
         }
         return res
@@ -152,7 +160,9 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: schema_1.member.password,
             isVerified: schema_1.member.isAccountVerified,
             username: schema_1.member.userName,
-            name: schema_1.member.name
+            name: schema_1.member.name,
+            selectedPlan: schema_1.member.selectedPlan,
+            isPlanSelected: schema_1.member.isPlanSelected,
         })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.email, signinData.data.email));
@@ -185,7 +195,9 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             success: true,
             message: config_1.responseMessages.signin,
             username: getDbUser[0].username,
-            name: getDbUser[0].name
+            name: getDbUser[0].name,
+            selectedPlan: getDbUser[0].selectedPlan,
+            isPlanSelected: getDbUser[0].isPlanSelected,
         });
     }
     catch (error) {
@@ -216,7 +228,7 @@ const getProfileDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
             dob: schema_1.member.dob,
             gender: schema_1.member.gender,
             profession: schema_1.member.profession,
-            memberId: schema_1.member.id
+            memberId: schema_1.member.id,
         })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.id, user));
@@ -225,11 +237,17 @@ const getProfileDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 .status(401)
                 .json({ success: false, message: "No member found." });
         }
-        return res.status(201).json({ success: true, message: "member fetched", memberProfile: getUser });
+        return res.status(201).json({
+            success: true,
+            message: "member fetched",
+            memberProfile: getUser,
+        });
     }
     catch (error) {
         console.log(error);
-        return res.status(500).json({ success: false, message: config_1.responseMessages.serverError });
+        return res
+            .status(500)
+            .json({ success: false, message: config_1.responseMessages.serverError });
     }
 });
 exports.getProfileDetails = getProfileDetails;
@@ -239,20 +257,35 @@ const updateUserName = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const user = req.userId;
     const { newUserName } = req.body;
     if (typeof user !== "number" || typeof newUserName !== "string") {
-        return res.status(400).json({ success: false, message: "Information is not sufficient or incorrect to procced with this request." });
+        return res.status(400).json({
+            success: false,
+            message: "Information is not sufficient or incorrect to procced with this request.",
+        });
     }
     try {
-        const getDbUser = yield db_1.db.update(schema_1.member).set({
-            userName: newUserName
-        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user)).returning({ username: schema_1.member.userName });
+        const getDbUser = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            userName: newUserName,
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .returning({ username: schema_1.member.userName });
         if (getDbUser.length === 0) {
-            return res.status(400).json({ success: false, message: "Unable to update your username" });
+            return res
+                .status(400)
+                .json({ success: false, message: "Unable to update your username" });
         }
-        return res.status(201).json({ success: true, message: "Username updated successfully", username: getDbUser[0].username });
+        return res.status(201).json({
+            success: true,
+            message: "Username updated successfully",
+            username: getDbUser[0].username,
+        });
     }
     catch (error) {
         console.log(error);
-        return res.status(500).json({ success: false, message: config_1.responseMessages.serverError });
+        return res
+            .status(500)
+            .json({ success: false, message: config_1.responseMessages.serverError });
     }
 });
 exports.updateUserName = updateUserName;
@@ -262,27 +295,81 @@ const updateName = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const user = req.userId;
     const { newName } = req.body;
     if (typeof user !== "number" || typeof newName !== "string") {
-        return res.status(400).json({ success: false, message: "Information is not sufficient or incorrect to procced with this request." });
+        return res.status(400).json({
+            success: false,
+            message: "Information is not sufficient or incorrect to procced with this request.",
+        });
     }
     try {
-        const getDbUser = yield db_1.db.update(schema_1.member).set({
-            name: newName
-        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user)).returning({
+        const getDbUser = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            name: newName,
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .returning({
             imageUrl: schema_1.member.profileImage,
             userName: schema_1.member.userName,
             name: schema_1.member.name,
             gender: schema_1.member.gender,
             profession: schema_1.member.profession,
-            dob: schema_1.member.dob
+            dob: schema_1.member.dob,
         });
         if (getDbUser.length === 0) {
-            return res.status(400).json({ success: false, message: "Unable to update your name" });
+            return res
+                .status(400)
+                .json({ success: false, message: "Unable to update your name" });
         }
-        return res.status(201).json({ success: true, message: "Name updated successfully", memberProfile: getDbUser[0] });
+        return res.status(201).json({
+            success: true,
+            message: "Name updated successfully",
+            memberProfile: getDbUser[0],
+        });
     }
     catch (error) {
         console.log(error);
-        return res.status(500).json({ success: false, message: config_1.responseMessages.serverError });
+        return res
+            .status(500)
+            .json({ success: false, message: config_1.responseMessages.serverError });
     }
 });
 exports.updateName = updateName;
+// handle plan selection
+const selectPlan = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { selectedPlan } = req.body;
+    //@ts-ignore
+    const user = req.userId;
+    if (typeof user !== "number" || typeof selectedPlan !== "string") {
+        console.log("ran");
+        return res.status({
+            success: false,
+            message: "Invalid data, not able to process",
+        });
+    }
+    const allowedPlansArr = ["basic", "elite", "premium", "none"];
+    const plan = selectedPlan;
+    // db operation
+    try {
+        const update = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            isPlanSelected: true,
+            selectedPlan: plan,
+        })
+            .returning({ selectedPlan: schema_1.member.selectedPlan, isPlanSelected: schema_1.member.isPlanSelected });
+        return res.status(200).json({
+            success: true,
+            message: "Plan updated",
+            selectedPlan: update[0].selectedPlan,
+            isPlanSelected: update[0].isPlanSelected
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+});
+exports.selectPlan = selectPlan;

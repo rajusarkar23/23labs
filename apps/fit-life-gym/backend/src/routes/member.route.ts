@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getProfileDetails,
+  selectPlan,
   signin,
   signup,
   updateName,
@@ -25,5 +26,6 @@ router.put(
   userAuthSession,
   updateName
 );
+router.put("/member/profile/plan-selection", userAuthSession, selectPlan)
 
 export default router;

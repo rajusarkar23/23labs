@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentSchema = exports.like = exports.post = exports.member = exports.genderEnum = void 0;
+exports.commentSchema = exports.like = exports.post = exports.member = exports.planEnum = exports.genderEnum = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const config_1 = require("../../config");
 exports.genderEnum = (0, pg_core_1.pgEnum)("gender", ["male", "female"]);
+exports.planEnum = (0, pg_core_1.pgEnum)("plan", ["basic", "premium", "elite", "none"]);
 // members table
 exports.member = (0, pg_core_1.pgTable)("members", {
     id: (0, pg_core_1.integer)("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -13,6 +14,8 @@ exports.member = (0, pg_core_1.pgTable)("members", {
     password: (0, pg_core_1.text)("password").notNull(),
     otp: (0, pg_core_1.text)("otp").notNull(),
     isAccountVerified: (0, pg_core_1.boolean)("is_account_verified").default(false),
+    isPlanSelected: (0, pg_core_1.boolean)("is_plan_selected").default(false),
+    selectedPlan: (0, exports.planEnum)("selected_plan").default("none"),
     profileImage: (0, pg_core_1.text)("profile_image").notNull().default(`${config_1.profileImage}`),
     profession: (0, pg_core_1.text)("profession"),
     gender: (0, exports.genderEnum)("gender"),

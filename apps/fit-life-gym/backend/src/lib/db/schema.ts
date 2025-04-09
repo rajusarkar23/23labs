@@ -2,6 +2,7 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/
 import { profileImage } from "../../config";
 
 export const genderEnum = pgEnum("gender", ["male", "female"])
+export const planEnum = pgEnum("plan", ["basic", "premium", "elite", "none"])
 
 // members table
 export const member = pgTable("members",{
@@ -12,6 +13,8 @@ export const member = pgTable("members",{
     password: text("password").notNull(),
     otp: text("otp").notNull(),
     isAccountVerified: boolean("is_account_verified").default(false),
+    isPlanSelected: boolean("is_plan_selected").default(false),
+    selectedPlan: planEnum("selected_plan").default("none"),
     profileImage: text("profile_image").notNull().default(`${profileImage}`),
     profession: text("profession"),
     gender: genderEnum("gender"),

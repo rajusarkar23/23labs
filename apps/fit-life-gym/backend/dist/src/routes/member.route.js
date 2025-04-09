@@ -10,4 +10,5 @@ router.post("/member/auth/signin", member_controller_1.signin);
 router.get("/member/profile/get-profile", middlewares_1.userAuthSession, member_controller_1.getProfileDetails);
 router.put("/member/profile/update-username", middlewares_1.userAuthSession, member_controller_1.updateUserName);
 router.put("/member/profile/update-name", middlewares_1.userAuthSession, member_controller_1.updateName);
+router.put("/member/profile/plan-selection", middlewares_1.userAuthSession, member_controller_1.selectPlan);
 exports.default = router;

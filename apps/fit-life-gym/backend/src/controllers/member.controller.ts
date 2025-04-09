@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { db } from "../lib/db";
-import { member } from "../lib/db/schema";
+import { member, planEnum } from "../lib/db/schema";
 import { generateOtp, responseMessages } from "../config";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
@@ -94,7 +94,13 @@ const verifyOtp = async (req: Request, res: any) => {
 
   try {
     const getUser = await db
-      .select({ otp: member.otp, id: member.id, username: member.userName })
+      .select({
+        otp: member.otp,
+        id: member.id,
+        username: member.userName,
+        selectedPlan: member.selectedPlan,
+        isPlanSelected: member.isPlanSelected,
+      })
       .from(member)
       .where(eq(member.id, user));
     const dbOTP = getUser[0].otp;
@@ -126,6 +132,8 @@ const verifyOtp = async (req: Request, res: any) => {
           success: true,
           message: responseMessages.signin,
           username: getUser[0].username,
+          selectedPlan: getUser[0].selectedPlan,
+          isPlanSelected: getUser[0].isPlanSelected,
         });
     }
 
@@ -161,7 +169,9 @@ const signin = async (req: Request, res: any) => {
         password: member.password,
         isVerified: member.isAccountVerified,
         username: member.userName,
-        name: member.name
+        name: member.name,
+        selectedPlan: member.selectedPlan,
+        isPlanSelected: member.isPlanSelected,
       })
       .from(member)
       .where(eq(member.email, signinData.data.email));
@@ -202,7 +212,9 @@ const signin = async (req: Request, res: any) => {
         success: true,
         message: responseMessages.signin,
         username: getDbUser[0].username,
-        name: getDbUser[0].name
+        name: getDbUser[0].name,
+        selectedPlan: getDbUser[0].selectedPlan,
+        isPlanSelected: getDbUser[0].isPlanSelected,
       });
   } catch (error) {
     console.log(error);
@@ -234,7 +246,7 @@ const getProfileDetails = async (req: Request, res: any) => {
         dob: member.dob,
         gender: member.gender,
         profession: member.profession,
-        memberId: member.id
+        memberId: member.id,
       })
       .from(member)
       .where(eq(member.id, user));
@@ -245,74 +257,161 @@ const getProfileDetails = async (req: Request, res: any) => {
         .json({ success: false, message: "No member found." });
     }
 
-
-    return res.status(201).json({success: true, message :"member fetched", memberProfile: getUser})
+    return res.status(201).json({
+      success: true,
+      message: "member fetched",
+      memberProfile: getUser,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({success: false, message: responseMessages.serverError})
-    
+    return res
+      .status(500)
+      .json({ success: false, message: responseMessages.serverError });
   }
 };
 
 // update username
 const updateUserName = async (req: Request, res: any) => {
   //@ts-ignore
-  const user = req.userId
-  const {newUserName} = req.body
+  const user = req.userId;
+  const { newUserName } = req.body;
 
   if (typeof user !== "number" || typeof newUserName !== "string") {
-    return res.status(400).json({success: false, message: "Information is not sufficient or incorrect to procced with this request."})
+    return res.status(400).json({
+      success: false,
+      message:
+        "Information is not sufficient or incorrect to procced with this request.",
+    });
   }
 
   try {
-    const getDbUser = await db.update(member).set({
-      userName: newUserName
-    }).where(eq(member.id, user)).returning({username: member.userName})
+    const getDbUser = await db
+      .update(member)
+      .set({
+        userName: newUserName,
+      })
+      .where(eq(member.id, user))
+      .returning({ username: member.userName });
 
     if (getDbUser.length === 0) {
-      return res.status(400).json({success: false, message: "Unable to update your username"})
+      return res
+        .status(400)
+        .json({ success: false, message: "Unable to update your username" });
     }
 
-    return res.status(201).json({success: true, message: "Username updated successfully", username: getDbUser[0].username})
-    
+    return res.status(201).json({
+      success: true,
+      message: "Username updated successfully",
+      username: getDbUser[0].username,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({success: false, message: responseMessages.serverError})
+    return res
+      .status(500)
+      .json({ success: false, message: responseMessages.serverError });
   }
-}
+};
 
 // update name
 const updateName = async (req: Request, res: any) => {
   //@ts-ignore
-  const user = req.userId
-  const {newName} = req.body
+  const user = req.userId;
+  const { newName } = req.body;
 
   if (typeof user !== "number" || typeof newName !== "string") {
-    return res.status(400).json({success: false, message: "Information is not sufficient or incorrect to procced with this request."})
+    return res.status(400).json({
+      success: false,
+      message:
+        "Information is not sufficient or incorrect to procced with this request.",
+    });
   }
 
   try {
-    const getDbUser = await db.update(member).set({
-      name: newName
-    }).where(eq(member.id, user)).returning({
-      imageUrl: member.profileImage,
-      userName: member.userName, 
-      name: member.name, 
-      gender: member.gender,
-      profession: member.profession,
-      dob: member.dob
-    })
+    const getDbUser = await db
+      .update(member)
+      .set({
+        name: newName,
+      })
+      .where(eq(member.id, user))
+      .returning({
+        imageUrl: member.profileImage,
+        userName: member.userName,
+        name: member.name,
+        gender: member.gender,
+        profession: member.profession,
+        dob: member.dob,
+      });
 
     if (getDbUser.length === 0) {
-      return res.status(400).json({success: false, message: "Unable to update your name"})
+      return res
+        .status(400)
+        .json({ success: false, message: "Unable to update your name" });
     }
 
-    return res.status(201).json({success: true, message: "Name updated successfully", memberProfile: getDbUser[0]})
-    
+    return res.status(201).json({
+      success: true,
+      message: "Name updated successfully",
+      memberProfile: getDbUser[0],
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({success: false, message: responseMessages.serverError})
+    return res
+      .status(500)
+      .json({ success: false, message: responseMessages.serverError });
   }
-}
+};
 
-export { signup, verifyOtp, signin, getProfileDetails, updateUserName, updateName };
+// handle plan selection
+const selectPlan = async (req: Request, res: any) => {
+  const { selectedPlan } = req.body;
+
+  //@ts-ignore
+  const user = req.userId;
+
+  if (typeof user !== "number" || typeof selectedPlan !== "string") {
+    console.log("ran");
+
+    return res.status({
+      success: false,
+      message: "Invalid data, not able to process",
+    });
+  }
+
+  const allowedPlansArr = ["basic", "elite", "premium", "none"] as const;
+
+  const plan = selectedPlan as (typeof allowedPlansArr)[number];
+
+  // db operation
+  try {
+    const update = await db
+      .update(member)
+      .set({
+        isPlanSelected: true,
+        selectedPlan: plan,
+      })
+      .returning({selectedPlan: member.selectedPlan, isPlanSelected: member.isPlanSelected});
+
+    return res.status(200).json({
+      success: true,
+      message: "Plan updated",
+      selectedPlan: update[0].selectedPlan,
+      isPlanSelected: update[0].isPlanSelected
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export {
+  signup,
+  verifyOtp,
+  signin,
+  getProfileDetails,
+  updateUserName,
+  updateName,
+  selectPlan,
+};
