@@ -152,6 +152,7 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: schema_1.member.password,
             isVerified: schema_1.member.isAccountVerified,
             username: schema_1.member.userName,
+            name: schema_1.member.name
         })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.email, signinData.data.email));
@@ -184,6 +185,7 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             success: true,
             message: config_1.responseMessages.signin,
             username: getDbUser[0].username,
+            name: getDbUser[0].name
         });
     }
     catch (error) {

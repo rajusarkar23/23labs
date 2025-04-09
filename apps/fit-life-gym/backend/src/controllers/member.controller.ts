@@ -161,6 +161,7 @@ const signin = async (req: Request, res: any) => {
         password: member.password,
         isVerified: member.isAccountVerified,
         username: member.userName,
+        name: member.name
       })
       .from(member)
       .where(eq(member.email, signinData.data.email));
@@ -201,6 +202,7 @@ const signin = async (req: Request, res: any) => {
         success: true,
         message: responseMessages.signin,
         username: getDbUser[0].username,
+        name: getDbUser[0].name
       });
   } catch (error) {
     console.log(error);
