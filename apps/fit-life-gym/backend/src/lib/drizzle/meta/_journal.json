@@ -148,6 +148,13 @@
       "when": 1744195525622,
       "tag": "0020_long_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1744276812326,
+      "tag": "0021_magical_killmonger",
+      "breakpoints": true
     }
   ]
 }
