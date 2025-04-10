@@ -9,7 +9,7 @@ exports.responseMessages = {
     notFound: "Nothing found with the provided inputs, make sure inputs are correct",
     notAuthorized: "Unauthorized, check credentials",
     invalidOtp: "Wrong OTP",
-    emailAlreadyExists: "This email already exists is database",
+    emailAlreadyExists: "This email already exists in the database",
     invalidJwt: "Invalid jwt login again"
 };
 const generateOtp = (otpLength) => {

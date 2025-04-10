@@ -83,8 +83,8 @@ const signup = async (req: Request, res: any) => {
     //@ts-ignore
     const adminFromJwt = req.adminId;
   
-    const { otp } = req.body;
-  
+    const {otp} = req.body;
+    
     if (typeof adminFromJwt !== "number") {
       return res
         .status(401)
@@ -100,7 +100,7 @@ const signup = async (req: Request, res: any) => {
           username: admin.userName
         })
         .from(admin)
-        .where(eq(admin.id, admin));
+        .where(eq(admin.id, adminFromJwt));
       const dbOTP = getUser[0].otp;
   
       // decode otp
@@ -112,7 +112,7 @@ const signup = async (req: Request, res: any) => {
           .set({
             isAccountVerified: true,
           })
-          .where(eq(admin.id, admin));
+          .where(eq(admin.id, adminFromJwt));
   
         const jwt_token = jwt.sign(
           { adminId: getUser[0].id },

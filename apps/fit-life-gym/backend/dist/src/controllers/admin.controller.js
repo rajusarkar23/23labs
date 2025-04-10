@@ -102,7 +102,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             username: schema_1.admin.userName
         })
             .from(schema_1.admin)
-            .where((0, drizzle_orm_1.eq)(schema_1.admin.id, schema_1.admin));
+            .where((0, drizzle_orm_1.eq)(schema_1.admin.id, adminFromJwt));
         const dbOTP = getUser[0].otp;
         // decode otp
         const compare = yield bcrypt_1.default.compare(otp, dbOTP);
@@ -112,7 +112,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 .set({
                 isAccountVerified: true,
             })
-                .where((0, drizzle_orm_1.eq)(schema_1.admin.id, schema_1.admin));
+                .where((0, drizzle_orm_1.eq)(schema_1.admin.id, adminFromJwt));
             const jwt_token = jsonwebtoken_1.default.sign({ adminId: getUser[0].id }, `${process.env.JWT_SECRET}`);
             return res
                 .cookie("_fit_life_gym_auth_admin", jwt_token, {
