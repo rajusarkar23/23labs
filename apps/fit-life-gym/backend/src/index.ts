@@ -33,3 +33,5 @@ import memberRouter from "./routes/member.route";
 app.use("/api/v1", memberRouter);
 import postRouter from "./routes/post.route";
 app.use("/api/v1", postRouter)
+import adminRouter from "./routes/admin.route"
+app.use("/api/v1", adminRouter)
