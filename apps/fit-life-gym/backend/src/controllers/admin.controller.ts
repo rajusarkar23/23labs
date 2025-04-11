@@ -97,7 +97,7 @@ const signup = async (req: Request, res: any) => {
           otp: admin.otp,
           id: admin.id,
           name: admin.name,
-          username: admin.userName
+          username: admin.userName,
         })
         .from(admin)
         .where(eq(admin.id, adminFromJwt));
@@ -130,6 +130,7 @@ const signup = async (req: Request, res: any) => {
             success: true,
             message: responseMessages.signin,
             username: getUser[0].username,
+            name: getUser[0].name
           });
       }
   

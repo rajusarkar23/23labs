@@ -99,7 +99,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             otp: schema_1.admin.otp,
             id: schema_1.admin.id,
             name: schema_1.admin.name,
-            username: schema_1.admin.userName
+            username: schema_1.admin.userName,
         })
             .from(schema_1.admin)
             .where((0, drizzle_orm_1.eq)(schema_1.admin.id, adminFromJwt));
@@ -125,6 +125,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 success: true,
                 message: config_1.responseMessages.signin,
                 username: getUser[0].username,
+                name: getUser[0].name
             });
         }
         return res

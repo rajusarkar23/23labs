@@ -19,6 +19,9 @@ export const member = pgTable("members",{
     profession: text("profession"),
     gender: genderEnum("gender"),
     dob: text("dob"),
+    isAactive: boolean("is_active").default(false),
+    subscriptionEnd: text("subscription_end"),
+    subscriptionStart: text("subscription_start"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().$onUpdate(() => new Date())
 })

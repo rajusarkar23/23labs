@@ -20,6 +20,9 @@ exports.member = (0, pg_core_1.pgTable)("members", {
     profession: (0, pg_core_1.text)("profession"),
     gender: (0, exports.genderEnum)("gender"),
     dob: (0, pg_core_1.text)("dob"),
+    isAactive: (0, pg_core_1.boolean)("is_active").default(false),
+    subscriptionEnd: (0, pg_core_1.text)("subscription_end"),
+    subscriptionStart: (0, pg_core_1.text)("subscription_start"),
     createdAt: (0, pg_core_1.timestamp)("created_at").notNull().defaultNow(),
     updatedAt: (0, pg_core_1.timestamp)("updated_at").notNull().$onUpdate(() => new Date())
 });

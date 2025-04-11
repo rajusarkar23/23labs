@@ -57,6 +57,7 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             name: signupData.data.name,
             userName: signupData.data.email,
             password: hashedPassword,
+            subscriptionStart: new Date().toString(),
             otp: hashedOtp,
         })
             .returning({ id: schema_1.member.id });
@@ -348,6 +349,12 @@ const selectPlan = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     const allowedPlansArr = ["basic", "elite", "premium", "none"];
     const plan = selectedPlan;
+    const today = new Date();
+    function getFurureDate() {
+        const futureDate = new Date(today);
+        futureDate.setDate(today.getDate() + 365);
+        return futureDate;
+    }
     // db operation
     try {
         const update = yield db_1.db
@@ -355,7 +362,10 @@ const selectPlan = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             .set({
             isPlanSelected: true,
             selectedPlan: plan,
-        })
+            isAactive: true,
+            subscriptionStart: today.toString(),
+            subscriptionEnd: getFurureDate().toString()
+        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
             .returning({ selectedPlan: schema_1.member.selectedPlan, isPlanSelected: schema_1.member.isPlanSelected });
         return res.status(200).json({
             success: true,

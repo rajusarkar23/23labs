@@ -48,6 +48,7 @@ const signup = async (req: Request, res: any) => {
         name: signupData.data.name,
         userName: signupData.data.email,
         password: hashedPassword,
+        subscriptionStart: new Date().toString(),
         otp: hashedOtp,
       })
       .returning({ id: member.id });
@@ -381,6 +382,14 @@ const selectPlan = async (req: Request, res: any) => {
 
   const plan = selectedPlan as (typeof allowedPlansArr)[number];
 
+  const today = new Date()
+
+  function getFurureDate(){
+    const futureDate = new Date(today)
+    futureDate.setDate(today.getDate() + 365)
+    return futureDate
+  }
+
   // db operation
   try {
     const update = await db
@@ -388,7 +397,10 @@ const selectPlan = async (req: Request, res: any) => {
       .set({
         isPlanSelected: true,
         selectedPlan: plan,
-      })
+        isAactive: true,
+        subscriptionStart: today.toString(),
+        subscriptionEnd: getFurureDate().toString()
+      }).where(eq(member.id, user))
       .returning({selectedPlan: member.selectedPlan, isPlanSelected: member.isPlanSelected});
 
     return res.status(200).json({
