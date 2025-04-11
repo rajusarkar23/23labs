@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyOtp = exports.signup = exports.signin = void 0;
+exports.getMember = exports.verifyOtp = exports.signup = exports.signin = void 0;
 const config_1 = require("../config");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../lib/db");
@@ -201,3 +201,34 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.signin = signin;
+// get members 
+const getMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const getMembers = yield db_1.db.select({
+            name: schema_1.member.name,
+            email: schema_1.member.email,
+            isActive: schema_1.member.isAactive,
+            subscriptionStarted: schema_1.member.subscriptionStart,
+            subscriptionEnds: schema_1.member.subscriptionEnd
+        }).from(schema_1.member);
+        if (getMembers.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No members found."
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Members fetched",
+            members: getMembers
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+});
+exports.getMember = getMember;

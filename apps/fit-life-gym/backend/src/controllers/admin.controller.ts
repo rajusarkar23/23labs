@@ -2,7 +2,7 @@ import { Request } from "express";
 import { generateOtp, responseMessages } from "../config";
 import bcrypt from "bcrypt"
 import { db } from "../lib/db";
-import { admin } from "../lib/db/schema";
+import { admin, member } from "../lib/db/schema";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken"
 
@@ -217,4 +217,36 @@ const signup = async (req: Request, res: any) => {
     }
   };
 
-  export {signin, signup, verifyOtp}
+  // get members 
+  const getMember = async (req: Request, res: any) => {
+    try {
+      const getMembers = await db.select({
+        name: member.name,
+        email: member.email,
+        isActive: member.isAactive,
+        subscriptionStarted: member.subscriptionStart,
+        subscriptionEnds: member.subscriptionEnd
+      }).from(member)
+
+      if (getMembers.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No members found."
+        })
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Members fetched",
+        members: getMembers
+      })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error."
+      })
+    }
+  }
+
+  export {signin, signup, verifyOtp, getMember}
