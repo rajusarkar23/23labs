@@ -11,4 +11,7 @@ router.get("/member/profile/get-profile", middlewares_1.userAuthSession, member_
 router.put("/member/profile/update-username", middlewares_1.userAuthSession, member_controller_1.updateUserName);
 router.put("/member/profile/update-name", middlewares_1.userAuthSession, member_controller_1.updateName);
 router.put("/member/profile/plan-selection", middlewares_1.userAuthSession, member_controller_1.selectPlan);
+router.put("/member/profile/update-profession", middlewares_1.userAuthSession, member_controller_1.updateProfession);
+router.put("/member/profile/update-gender", middlewares_1.userAuthSession, member_controller_1.updateGender);
+router.put("/member/profile/update-dob", middlewares_1.userAuthSession, member_controller_1.updateDob);
 exports.default = router;

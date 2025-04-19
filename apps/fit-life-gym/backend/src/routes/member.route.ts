@@ -4,7 +4,10 @@ import {
   selectPlan,
   signin,
   signup,
+  updateDob,
+  updateGender,
   updateName,
+  updateProfession,
   updateUserName,
   verifyOtp,
 } from "../controllers/member.controller";
@@ -27,5 +30,8 @@ router.put(
   updateName
 );
 router.put("/member/profile/plan-selection", userAuthSession, selectPlan)
+router.put("/member/profile/update-profession", userAuthSession, updateProfession)
+router.put("/member/profile/update-gender", userAuthSession, updateGender)
+router.put("/member/profile/update-dob", userAuthSession, updateDob)
 
 export default router;
