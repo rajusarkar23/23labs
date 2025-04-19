@@ -8,6 +8,7 @@ import {
   updateGender,
   updateName,
   updateProfession,
+  updateProfilePhoto,
   updateUserName,
   verifyOtp,
 } from "../controllers/member.controller";
@@ -33,5 +34,6 @@ router.put("/member/profile/plan-selection", userAuthSession, selectPlan)
 router.put("/member/profile/update-profession", userAuthSession, updateProfession)
 router.put("/member/profile/update-gender", userAuthSession, updateGender)
 router.put("/member/profile/update-dob", userAuthSession, updateDob)
+router.put("/member/profile/update-profile-photo", userAuthSession, updateProfilePhoto)
 
 export default router;

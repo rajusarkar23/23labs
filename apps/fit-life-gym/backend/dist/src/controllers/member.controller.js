@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDob = exports.updateGender = exports.updateProfession = exports.selectPlan = exports.updateName = exports.updateUserName = exports.getProfileDetails = exports.signin = exports.verifyOtp = exports.signup = void 0;
+exports.updateProfilePhoto = exports.updateDob = exports.updateGender = exports.updateProfession = exports.selectPlan = exports.updateName = exports.updateUserName = exports.getProfileDetails = exports.signin = exports.verifyOtp = exports.signup = void 0;
 const db_1 = require("../lib/db");
 const schema_1 = require("../lib/db/schema");
 const config_1 = require("../config");
@@ -231,7 +231,7 @@ const getProfileDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
             profession: schema_1.member.profession,
             memberId: schema_1.member.id,
             planPurchasedOn: schema_1.member.subscriptionStart,
-            planEndsOn: schema_1.member.subscriptionEnd
+            planEndsOn: schema_1.member.subscriptionEnd,
         })
             .from(schema_1.member)
             .where((0, drizzle_orm_1.eq)(schema_1.member.id, user));
@@ -366,14 +366,18 @@ const selectPlan = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             selectedPlan: plan,
             isAactive: true,
             subscriptionStart: today.toString(),
-            subscriptionEnd: getFurureDate().toString()
-        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
-            .returning({ selectedPlan: schema_1.member.selectedPlan, isPlanSelected: schema_1.member.isPlanSelected });
+            subscriptionEnd: getFurureDate().toString(),
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .returning({
+            selectedPlan: schema_1.member.selectedPlan,
+            isPlanSelected: schema_1.member.isPlanSelected,
+        });
         return res.status(200).json({
             success: true,
             message: "Plan updated",
             selectedPlan: update[0].selectedPlan,
-            isPlanSelected: update[0].isPlanSelected
+            isPlanSelected: update[0].isPlanSelected,
         });
     }
     catch (error) {
@@ -393,29 +397,33 @@ const updateProfession = (req, res) => __awaiter(void 0, void 0, void 0, functio
     if (typeof data !== "string" || typeof user !== "number") {
         return res.status(400).json({
             success: false,
-            message: "Not able to update your profession"
+            message: "Not able to update your profession",
         });
     }
     try {
-        const updateUser = yield db_1.db.update(schema_1.member).set({
-            profession: data === null || data === void 0 ? void 0 : data.toString()
-        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user)).returning();
+        const updateUser = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            profession: data === null || data === void 0 ? void 0 : data.toString(),
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .returning();
         if (updateUser.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "Something went wrong"
+                message: "Something went wrong",
             });
         }
         return res.status(200).json({
             success: true,
-            message: "Profession updated."
+            message: "Profession updated.",
         });
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
-            message: "Internal server error."
+            message: "Internal server error.",
         });
     }
 });
@@ -428,31 +436,35 @@ const updateGender = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     if (typeof data !== "string" || typeof user !== "number") {
         return res.status(400).json({
             success: false,
-            message: "Not able to update your profession"
+            message: "Not able to update your gender",
         });
     }
     const allowedGenderArr = ["male", "female"];
     const gender = data;
     try {
-        const updateGenderUser = yield db_1.db.update(schema_1.member).set({
-            gender: gender
-        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user)).returning();
+        const updateGenderUser = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            gender: gender,
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .returning();
         if (updateGenderUser.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "Not able to update gender"
+                message: "Not able to update gender",
             });
         }
         return res.status(200).json({
             success: true,
-            message: "Gender updated successfully"
+            message: "Gender updated successfully",
         });
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
-            message: "Internal server error"
+            message: "Internal server error",
         });
     }
 });
@@ -465,22 +477,64 @@ const updateDob = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (typeof data !== "string" || typeof user !== "number") {
         return res.status(400).json({
             success: false,
-            message: "Not able to update your profession"
+            message: "Not able to update your profession",
         });
     }
     try {
-        const updateDateofBirth = yield db_1.db.update(schema_1.member).set({
-            dob: data.toString()
-        }).where((0, drizzle_orm_1.eq)(schema_1.member.id, user)).returning();
+        const updateDateofBirth = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            dob: data.toString(),
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user))
+            .returning();
         if (updateDateofBirth.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "Not able to update dob"
+                message: "Not able to update dob",
             });
         }
         return res.status(200).json({
             success: true,
-            message: "dob updated successfully"
+            message: "dob updated successfully",
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+});
+exports.updateDob = updateDob;
+// update profile photo
+const updateProfilePhoto = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data } = req.query;
+    //@ts-ignore
+    const user = req.userId;
+    if (typeof data !== "string" || typeof user !== "number") {
+        return res.status(400).json({
+            success: false,
+            message: "Not able to update your profile photo",
+        });
+    }
+    try {
+        const updateProfile = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            profileImage: data === null || data === void 0 ? void 0 : data.toString(),
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, user)).returning();
+        if (updateProfile.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Not able to update your profile"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully."
         });
     }
     catch (error) {
@@ -491,4 +545,4 @@ const updateDob = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-exports.updateDob = updateDob;
+exports.updateProfilePhoto = updateProfilePhoto;

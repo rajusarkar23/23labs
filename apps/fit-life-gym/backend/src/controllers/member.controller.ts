@@ -249,7 +249,7 @@ const getProfileDetails = async (req: Request, res: any) => {
         profession: member.profession,
         memberId: member.id,
         planPurchasedOn: member.subscriptionStart,
-        planEndsOn: member.subscriptionEnd
+        planEndsOn: member.subscriptionEnd,
       })
       .from(member)
       .where(eq(member.id, user));
@@ -384,12 +384,12 @@ const selectPlan = async (req: Request, res: any) => {
 
   const plan = selectedPlan as (typeof allowedPlansArr)[number];
 
-  const today = new Date()
+  const today = new Date();
 
-  function getFurureDate(){
-    const futureDate = new Date(today)
-    futureDate.setDate(today.getDate() + 365)
-    return futureDate
+  function getFurureDate() {
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 365);
+    return futureDate;
   }
 
   // db operation
@@ -401,15 +401,19 @@ const selectPlan = async (req: Request, res: any) => {
         selectedPlan: plan,
         isAactive: true,
         subscriptionStart: today.toString(),
-        subscriptionEnd: getFurureDate().toString()
-      }).where(eq(member.id, user))
-      .returning({selectedPlan: member.selectedPlan, isPlanSelected: member.isPlanSelected});
+        subscriptionEnd: getFurureDate().toString(),
+      })
+      .where(eq(member.id, user))
+      .returning({
+        selectedPlan: member.selectedPlan,
+        isPlanSelected: member.isPlanSelected,
+      });
 
     return res.status(200).json({
       success: true,
       message: "Plan updated",
       selectedPlan: update[0].selectedPlan,
-      isPlanSelected: update[0].isPlanSelected
+      isPlanSelected: update[0].isPlanSelected,
     });
   } catch (error) {
     console.log(error);
@@ -422,77 +426,170 @@ const selectPlan = async (req: Request, res: any) => {
 
 // update profession
 const updateProfession = async (req: Request, res: any) => {
-  const {data} = req.query;
+  const { data } = req.query;
 
   //@ts-ignore
   const user = req.userId;
-  
-  if (typeof data !== "string" || typeof user !=="number") {
+
+  if (typeof data !== "string" || typeof user !== "number") {
     return res.status(400).json({
       success: false,
-      message: "Not able to update your profession"
-    })
+      message: "Not able to update your profession",
+    });
   }
-  
+
   try {
-    const updateUser = await db.update(member).set({
-      profession: data?.toString()
-    }).where(eq(member.id, user)).returning()
+    const updateUser = await db
+      .update(member)
+      .set({
+        profession: data?.toString(),
+      })
+      .where(eq(member.id, user))
+      .returning();
 
     if (updateUser.length === 0) {
       return res.status(400).json({
-        success:false,
-        message: "Something went wrong"
-      })
+        success: false,
+        message: "Something went wrong",
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Profession updated."
-    })
-
+      message: "Profession updated.",
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error."
-    })
+      message: "Internal server error.",
+    });
   }
-}
+};
 
 // update gender
 const updateGender = async (req: Request, res: any) => {
-  const {data} = req.query;
+  const { data } = req.query;
   //@ts-ignore
   const user = req.userId;
 
-  if (typeof data !== "string" || typeof user !=="number") {
+  if (typeof data !== "string" || typeof user !== "number") {
     return res.status(400).json({
       success: false,
-      message: "Not able to update your gender"
-    })
+      message: "Not able to update your gender",
+    });
   }
 
   const allowedGenderArr = ["male", "female"] as const;
 
-  const gender = data as (typeof allowedGenderArr)[number]
-  
+  const gender = data as (typeof allowedGenderArr)[number];
+
   try {
-    const updateGenderUser = await db.update(member).set({
-      gender: gender
-    }).where(eq(member.id, user)).returning()
+    const updateGenderUser = await db
+      .update(member)
+      .set({
+        gender: gender,
+      })
+      .where(eq(member.id, user))
+      .returning();
 
     if (updateGenderUser.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Not able to update gender"
-      })
+        message: "Not able to update gender",
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Gender updated successfully"
-    })
+      message: "Gender updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// update dob
+const updateDob = async (req: Request, res: any) => {
+  const { data } = req.query;
+  //@ts-ignore
+  const user = req.userId;
+
+  if (typeof data !== "string" || typeof user !== "number") {
+    return res.status(400).json({
+      success: false,
+      message: "Not able to update your profession",
+    });
+  }
+
+  try {
+    const updateDateofBirth = await db
+      .update(member)
+      .set({
+        dob: data.toString(),
+      })
+      .where(eq(member.id, user))
+      .returning();
+
+    if (updateDateofBirth.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Not able to update dob",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "dob updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// update profile photo
+const updateProfilePhoto = async (req: Request, res: any) => {
+  const { data } = req.query;
+  //@ts-ignore
+  const user = req.userId;
+
+  if (typeof data !== "string" || typeof user !== "number") {
+    return res.status(400).json({
+      success: false,
+      message: "Not able to update your profile photo",
+    });
+  }
+
+
+  try {
+    const updateProfile = await db
+      .update(member)
+      .set({
+        profileImage: data?.toString(),
+      })
+      .where(eq(member.id, user)).returning()
+
+      if (updateProfile.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Not able to update your profile"
+        })
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully."
+      })
+
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -500,46 +597,7 @@ const updateGender = async (req: Request, res: any) => {
       message: "Internal server error"
     })
   }
-}
-
-// update dob
-const updateDob = async (req: Request, res: any) => {
-  const {data} = req.query;
-  //@ts-ignore
-  const user = req.userId;
-
-  if (typeof data !== "string" || typeof user !=="number") {
-    return res.status(400).json({
-      success: false,
-      message: "Not able to update your profession"
-    })
-  }
-
-  
- try {
-     const updateDateofBirth = await db.update(member).set({
-       dob: data.toString()
-     }).where(eq(member.id, user)).returning()
- 
-     if (updateDateofBirth.length === 0) {
-       return res.status(400).json({
-         success: false,
-         message: "Not able to update dob"
-       })
-     }
- 
-     return res.status(200).json({
-       success: true,
-       message: "dob updated successfully"
-     })
- } catch (error) {
-  console.log(error);
-  return res.status(500).json({
-    success: false,
-    message: "Internal server error"
-  })
- }
-}
+};
 
 export {
   signup,
@@ -551,5 +609,6 @@ export {
   selectPlan,
   updateProfession,
   updateGender,
-  updateDob
+  updateDob,
+  updateProfilePhoto
 };
