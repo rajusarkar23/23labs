@@ -225,7 +225,8 @@ const signup = async (req: Request, res: any) => {
         email: member.email,
         isActive: member.isAactive,
         subscriptionStarted: member.subscriptionStart,
-        subscriptionEnds: member.subscriptionEnd
+        subscriptionEnds: member.subscriptionEnd,
+        selectedPlan: member.selectedPlan
       }).from(member)
 
       if (getMembers.length === 0) {

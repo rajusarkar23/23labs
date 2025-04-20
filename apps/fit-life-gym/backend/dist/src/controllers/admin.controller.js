@@ -209,7 +209,8 @@ const getMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             email: schema_1.member.email,
             isActive: schema_1.member.isAactive,
             subscriptionStarted: schema_1.member.subscriptionStart,
-            subscriptionEnds: schema_1.member.subscriptionEnd
+            subscriptionEnds: schema_1.member.subscriptionEnd,
+            selectedPlan: schema_1.member.selectedPlan
         }).from(schema_1.member);
         if (getMembers.length === 0) {
             return res.status(400).json({
