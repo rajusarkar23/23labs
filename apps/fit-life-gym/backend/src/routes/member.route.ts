@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getProfileDetails,
+  logout,
   selectPlan,
   signin,
   signup,
@@ -35,5 +36,6 @@ router.put("/member/profile/update-profession", userAuthSession, updateProfessio
 router.put("/member/profile/update-gender", userAuthSession, updateGender)
 router.put("/member/profile/update-dob", userAuthSession, updateDob)
 router.put("/member/profile/update-profile-photo", userAuthSession, updateProfilePhoto)
+router.post("/member/logout", logout)
 
 export default router;

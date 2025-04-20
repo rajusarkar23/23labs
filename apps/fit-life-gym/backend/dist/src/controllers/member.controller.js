@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProfilePhoto = exports.updateDob = exports.updateGender = exports.updateProfession = exports.selectPlan = exports.updateName = exports.updateUserName = exports.getProfileDetails = exports.signin = exports.verifyOtp = exports.signup = void 0;
+exports.logout = exports.updateProfilePhoto = exports.updateDob = exports.updateGender = exports.updateProfession = exports.selectPlan = exports.updateName = exports.updateUserName = exports.getProfileDetails = exports.signin = exports.verifyOtp = exports.signup = void 0;
 const db_1 = require("../lib/db");
 const schema_1 = require("../lib/db/schema");
 const config_1 = require("../config");
@@ -546,3 +546,20 @@ const updateProfilePhoto = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.updateProfilePhoto = updateProfilePhoto;
+// handle logout
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.clearCookie("_fit_life_gym_auth", {
+            httpOnly: true,
+            secure: true
+        });
+        return res.status(200).json({
+            success: true,
+            message: "Logout success"
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
+exports.logout = logout;

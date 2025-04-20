@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import { db } from "../lib/db";
 import { member, planEnum } from "../lib/db/schema";
 import { generateOtp, responseMessages } from "../config";
@@ -599,6 +599,24 @@ const updateProfilePhoto = async (req: Request, res: any) => {
   }
 };
 
+// handle logout
+const logout = async (req: Request, res: any) => {
+
+  try {
+     res.clearCookie("_fit_life_gym_auth", {
+    httpOnly: true,
+    secure: true
+  })
+  return res.status(200).json({
+    success: true,
+    message: "Logout success"
+  })
+  } catch (error) {
+    console.log(error);
+  }
+ 
+}
+
 export {
   signup,
   verifyOtp,
@@ -610,5 +628,6 @@ export {
   updateProfession,
   updateGender,
   updateDob,
-  updateProfilePhoto
+  updateProfilePhoto,
+  logout
 };

@@ -15,4 +15,5 @@ router.put("/member/profile/update-profession", middlewares_1.userAuthSession, m
 router.put("/member/profile/update-gender", middlewares_1.userAuthSession, member_controller_1.updateGender);
 router.put("/member/profile/update-dob", middlewares_1.userAuthSession, member_controller_1.updateDob);
 router.put("/member/profile/update-profile-photo", middlewares_1.userAuthSession, member_controller_1.updateProfilePhoto);
+router.post("/member/logout", member_controller_1.logout);
 exports.default = router;
