@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMember = exports.verifyOtp = exports.signup = exports.signin = void 0;
+exports.changeMemberStatus = exports.getMember = exports.verifyOtp = exports.signup = exports.signin = void 0;
 const config_1 = require("../config");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../lib/db");
@@ -125,7 +125,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 success: true,
                 message: config_1.responseMessages.signin,
                 username: getUser[0].username,
-                name: getUser[0].name
+                name: getUser[0].name,
             });
         }
         return res
@@ -143,8 +143,7 @@ exports.verifyOtp = verifyOtp;
 // member signin
 const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
-    if (typeof email !== "string" ||
-        typeof password !== "string") {
+    if (typeof email !== "string" || typeof password !== "string") {
         return res
             .status(401)
             .json({ success: false, message: config_1.responseMessages.invalidInput });
@@ -201,27 +200,74 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.signin = signin;
-// get members 
+// get members
 const getMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const getMembers = yield db_1.db.select({
+        const getMembers = yield db_1.db
+            .select({
+            memberId: schema_1.member.id,
             name: schema_1.member.name,
             email: schema_1.member.email,
             isActive: schema_1.member.isAactive,
             subscriptionStarted: schema_1.member.subscriptionStart,
             subscriptionEnds: schema_1.member.subscriptionEnd,
-            selectedPlan: schema_1.member.selectedPlan
-        }).from(schema_1.member);
+            selectedPlan: schema_1.member.selectedPlan,
+        })
+            .from(schema_1.member);
         if (getMembers.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "No members found."
+                message: "No members found.",
             });
         }
         return res.status(200).json({
             success: true,
             message: "Members fetched",
-            members: getMembers
+            members: getMembers,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
+    }
+});
+exports.getMember = getMember;
+// update member active status
+const changeMemberStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { status, memberId } = req.query;
+    // if (typeof data !== "string") {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Proper data did not received from client."
+    //   })
+    // }
+    console.log(status, memberId);
+    function getBool() {
+        if (status === "Inactive") {
+            return false;
+        }
+        return true;
+    }
+    console.log(getBool());
+    try {
+        const updateStatus = yield db_1.db
+            .update(schema_1.member)
+            .set({
+            isAactive: getBool(),
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.member.id, Number(memberId))).returning();
+        if (updateStatus.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Something went wrong while updating."
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Update success."
         });
     }
     catch (error) {
@@ -232,4 +278,4 @@ const getMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-exports.getMember = getMember;
+exports.changeMemberStatus = changeMemberStatus;

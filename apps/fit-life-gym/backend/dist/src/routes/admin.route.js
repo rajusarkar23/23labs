@@ -8,4 +8,5 @@ router.post("/admin/auth/signin", admin_controller_1.signin);
 router.post("/admin/auth/signup", admin_controller_1.signup);
 router.post("/admin/auth/verify-otp", middlewares_1.adminOtpVerifySession, admin_controller_1.verifyOtp);
 router.get("/admin/get-members", middlewares_1.adminOtpVerifySession, admin_controller_1.getMember);
+router.get("/admin/update-member-status", admin_controller_1.changeMemberStatus);
 exports.default = router;
