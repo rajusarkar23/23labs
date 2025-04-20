@@ -254,15 +254,6 @@ const getMember = async (req: Request, res: any) => {
 const changeMemberStatus = async (req: Request, res: any) => {
   const { status, memberId } = req.query;
 
-  // if (typeof data !== "string") {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "Proper data did not received from client."
-  //   })
-  // }
-
-  console.log(status, memberId);
-
   function getBool() {
     if (status === "Inactive") {
       return false;
@@ -300,4 +291,31 @@ const changeMemberStatus = async (req: Request, res: any) => {
   }
 };
 
-export { signin, signup, verifyOtp, getMember, changeMemberStatus };
+// delete member
+const deleteMember = async (req: Request, res: any) => {
+  const {data} = req.query;
+  if (typeof data === "undefined") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data received from client"
+    })
+  }
+
+  try {
+    const deleteMemberById = await db.delete(member).where(eq(member.id, Number(data))).returning()
+    
+    if (deleteMemberById.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Something went wrong while deleting."
+      })
+    }
+    
+    return res.status(200).json({success: true, message: "Delete success"})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({success: false, message: "Internal server error"})
+  }
+}
+
+export { signin, signup, verifyOtp, getMember, changeMemberStatus, deleteMember };

@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 8888;
 // allow cors
 app.use((0, cors_1.default)({
     origin: ["http://localhost:3000"],
-    methods: ["GET", "POST", "DELET", "PUT"],
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
 }));
 // allow cookie

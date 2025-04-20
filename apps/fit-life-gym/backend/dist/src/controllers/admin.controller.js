@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changeMemberStatus = exports.getMember = exports.verifyOtp = exports.signup = exports.signin = void 0;
+exports.deleteMember = exports.changeMemberStatus = exports.getMember = exports.verifyOtp = exports.signup = exports.signin = void 0;
 const config_1 = require("../config");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../lib/db");
@@ -238,13 +238,6 @@ exports.getMember = getMember;
 // update member active status
 const changeMemberStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { status, memberId } = req.query;
-    // if (typeof data !== "string") {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Proper data did not received from client."
-    //   })
-    // }
-    console.log(status, memberId);
     function getBool() {
         if (status === "Inactive") {
             return false;
@@ -279,3 +272,28 @@ const changeMemberStatus = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.changeMemberStatus = changeMemberStatus;
+// delete member
+const deleteMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data } = req.query;
+    if (typeof data === "undefined") {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid data received from client"
+        });
+    }
+    try {
+        const deleteMemberById = yield db_1.db.delete(schema_1.member).where((0, drizzle_orm_1.eq)(schema_1.member.id, Number(data))).returning();
+        if (deleteMemberById.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Something went wrong while deleting."
+            });
+        }
+        return res.status(200).json({ success: true, message: "Delete success" });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+exports.deleteMember = deleteMember;
